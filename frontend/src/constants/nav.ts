@@ -11,4 +11,5 @@ export const NAV_ITEMS: NavItem[] = [
   { path: '/policies', label: '掩码策略预览', index: '03', hint: '应用前后样例对比' },
   { path: '/k-anonymity', label: 'k-匿名校验', index: '04', hint: '等价类与泛化建议' },
   { path: '/exports', label: '导出台账', index: '05', hint: '申请 / 审批 / 摘要' },
+  { path: '/bundles', label: '联合去标识包', index: '06', hint: '三表稳定编号 / 范围缺口' },
 ];

@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from src.routes import (
     audit,
     auth,
+    bundle,
     dataset,
     export,
     health,
@@ -21,6 +22,7 @@ api_router.include_router(pii.router)
 api_router.include_router(policy.router)
 api_router.include_router(k_anonymity.router)
 api_router.include_router(export.router)
+api_router.include_router(bundle.router)
 api_router.include_router(audit.router)
 
 __all__ = ["api_router"]

@@ -76,6 +76,13 @@ class AuditAction(str, Enum):
     EXPORT_APPROVE = "export.approve"
     EXPORT_REJECT = "export.reject"
     EXPORT_DOWNLOAD = "export.download"
+    BUNDLE_PREVIEW = "bundle.preview"
+    BUNDLE_SUBMIT = "bundle.submit"
+    BUNDLE_APPROVE = "bundle.approve"
+    BUNDLE_REJECT = "bundle.reject"
+    BUNDLE_BUILD = "bundle.build"
+    BUNDLE_RETRY = "bundle.retry"
+    BUNDLE_DOWNLOAD = "bundle.download"
 
 
 PII_TYPE_LABELS: dict[str, str] = {

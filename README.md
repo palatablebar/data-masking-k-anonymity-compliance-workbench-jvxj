@@ -53,6 +53,23 @@ docker compose exec -T backend python -m scripts.seed_demo
    - 年龄基准日固定为 `2026-11-10`，seed/校验可复现。
 3. **异步执行**：k-匿名校验与导出文件生成由 Celery worker 执行（任务名 `maskguard.run_k_anonymity` /
    `maskguard.build_export`），backend 发起并落库；broker 不可用时同步兜底，前端轮询结果。
+4. **联合去标识包**（`backend/src/services/bundle_service.py`，任务 `maskguard.build_bundle`）
+   - 按患者范围（显式 `patient_ids` / 编号区间 / 全部患者，可并集）一次联动 `patients`、`visits`、`labs`。
+   - **稳定假名**：`HMAC-SHA256(HASH_SALT, "pseudonym-v1:" + patient_id)` 取前 16 位，三表共用；
+     补发、worker 重跑、同范围重复发起都得到同一编号，不再产生孤立记录。
+   - **关联去标识**：`visits` / `labs` 只保留范围内且关联完整的行；关联表日期统一降到年或年月
+     （`year` / `month` 可选），避免“患者编号 + 日期”重新拼回身份；无策略的直接标识列整值抑制。
+   - **缺口统计**：每表记录 `source_rows / input_rows / retained_rows / missing_rows` 与缺失原因
+     （患者主索引缺失、关联就诊不在包内、就诊-患者归属不一致），并统计无就诊/无检验患者数。
+   - **幂等 + 原子发布**：`scope_key = sha256(规范患者集合 + 日期精度 + 数据集版本 + 假名版本)`；
+     同 `scope_key` 复用同一条台账与同一批文件。staging 目录全部写成功后才整目录原子换入最终目录，
+     失败清理 staging、台账置 `failed`，可原地 `retry`，不会留下半套包。
+   - **文件**：`patients.csv / visits.csv / labs.csv / manifest.json / bundle.zip`；行序按主键固定，
+     manifest 不含时间戳，zip 条目时间戳固定，同范围重复生成字节一致。
+   - 接口：`POST /api/bundles`（发起）、`POST /api/bundles/preview`（只算缺口）、
+     `GET /api/bundles`、`GET /api/bundles/{id}`、`POST .../approve|reject|retry`、
+     `GET .../download`（zip）与 `GET .../download/{patients|visits|labs}`（单表 CSV）。
+     前端页面 `/bundles`：选范围 → 预检缺口 → 发起/审批 → 查看各表输入/保留/缺失 → 下载。
 
 ## 技术栈
 

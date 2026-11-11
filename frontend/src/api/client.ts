@@ -70,4 +70,29 @@ export const api = {
   postAnonymous: <T>(path: string, body?: unknown) =>
     request<T>(path, { method: 'POST', body, auth: false }),
   downloadPath: (path: string) => `${BASE}${path}`,
+  /** 带 Bearer 拉取文件后触发浏览器保存；直接 <a href> 不会带 Authorization。 */
+  downloadFile: async (path: string, filename: string): Promise<void> => {
+    const token = tokenStore.get();
+    const response = await fetch(`${BASE}${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!response.ok) {
+      let payload: ApiErrorShape = { code: 'INTERNAL_ERROR', message: response.statusText, detail: '' };
+      try {
+        payload = (await response.json()) as ApiErrorShape;
+      } catch {
+        /* 非 JSON 错误体 */
+      }
+      throw new ApiError(response.status, payload);
+    }
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+  },
 };

@@ -13,6 +13,7 @@ celery_app = Celery(
     include=[
         "worker_src.tasks.kanon_task",
         "worker_src.tasks.export_task",
+        "worker_src.tasks.bundle_task",
         "worker_src.tasks.heartbeat_task",
     ],
 )

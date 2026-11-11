@@ -227,6 +227,94 @@ export interface ExportRequest {
   created_at: string | null;
 }
 
+/* ---------------- 联合去标识包 ---------------- */
+
+export type BundleScopeMode = 'ids' | 'range' | 'all' | 'mixed';
+
+export interface BundleScope {
+  scope_key: string;
+  mode: BundleScopeMode;
+  patient_count: number;
+  date_granularity: 'year' | 'month';
+  dataset_version: string;
+  pseudonym_version: string;
+  patient_ids_preview: string[];
+  requested: {
+    patient_ids?: string[];
+    patient_id_start?: string | null;
+    patient_id_end?: string | null;
+    all_patients?: boolean;
+  };
+}
+
+export interface BundleTableStats {
+  table_name: string;
+  source_rows: number;
+  input_rows: number;
+  retained_rows: number;
+  missing_rows: number;
+  missing_reasons: Record<string, number>;
+  file?: string;
+  sha256?: string;
+  columns?: string[];
+}
+
+export interface BundleGaps {
+  missing_patient_count: number;
+  missing_patient_ids: string[];
+  missing_patient_ids_truncated: boolean;
+  patients_without_visits: number;
+  patients_without_labs: number;
+}
+
+export interface BundleStats {
+  patients?: BundleTableStats;
+  visits?: BundleTableStats;
+  labs?: BundleTableStats;
+  totals?: {
+    source_rows: number;
+    input_rows: number;
+    retained_rows: number;
+    missing_rows: number;
+  };
+  gaps?: BundleGaps;
+  manifest_sha256?: string;
+  zip_sha256?: string;
+}
+
+export interface JointBundle {
+  id: string;
+  scope_key: string;
+  scope: BundleScope;
+  purpose: string;
+  dataset_version: string;
+  requester_id: string;
+  requester_email: string;
+  requester_name: string;
+  status: ExportStatus;
+  build_status: BuildStatus;
+  review_note: string;
+  reviewed_by_email: string | null;
+  reviewed_at: string | null;
+  file_digest: string | null;
+  manifest_digest: string | null;
+  retained_rows: number | null;
+  attempt_count: number;
+  error_detail: string | null;
+  stats: BundleStats;
+  download_ready: boolean;
+  can_retry: boolean;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface BundlePreview {
+  scope: BundleScope;
+  stats: BundleStats;
+  existing_bundle_id: string | null;
+  existing_status: ExportStatus | null;
+}
+
 export interface AuditLog {
   id: string;
   actor_email: string;

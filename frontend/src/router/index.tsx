@@ -6,6 +6,7 @@ import { PiiEvidencePage } from '../pages/PiiEvidence';
 import { PolicyPreviewPage } from '../pages/PolicyPreview';
 import { KAnonymityPage } from '../pages/KAnonymity';
 import { ExportsPage } from '../pages/Exports';
+import { JointBundlesPage } from '../pages/JointBundles';
 import { requireAuth } from './guards';
 
 export const router = createBrowserRouter([
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
       { path: 'policies', element: <PolicyPreviewPage /> },
       { path: 'k-anonymity', element: <KAnonymityPage /> },
       { path: 'exports', element: <ExportsPage /> },
+      { path: 'bundles', element: <JointBundlesPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/datasets" replace /> },
